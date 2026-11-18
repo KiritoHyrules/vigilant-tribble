@@ -1,117 +1,76 @@
-# TRASU Front
+# TRASU
 
-Frontend de demostración para la gestión y el seguimiento de expedientes de
-TRASU. Incluye presentación pública, acceso por perfiles, flujos de trabajo y
-asistencia contextual. Desarrollado con React, TypeScript y Vite.
+Repositorio del sistema TRASU, organizado para mantener el frontend y el futuro
+backend en el mismo lugar, con dependencias y configuraciones independientes.
 
-> **Alcance:** es un prototipo interactivo con datos ficticios y operaciones
-> locales. No incluye backend, autenticación real ni autorización de producción.
-> Publicar el código en GitHub no despliega la aplicación.
+Actualmente contiene **TRASU Front**, un prototipo interactivo con React,
+TypeScript y Vite. El backend todavía no está implementado: no hay API,
+autenticación real ni persistencia institucional.
 
-## Requisitos
+## Contenido del repositorio
 
-- Node.js compatible con Vite 8; esta entrega se comprobó con Node.js 24.
-- npm y las versiones fijadas en `package-lock.json`.
-- Google Chrome para las pruebas de navegador: Playwright usa el canal `chrome`.
+```text
+.
+├── README.md           # Presentación y guía general del repositorio
+├── CONTRIBUTING.md     # Convenciones y comprobaciones para contribuir
+├── .gitignore          # Exclusiones comunes a los proyectos
+└── frontend/           # Aplicación web y toda su configuración
+    ├── README.md       # Instalación, comandos, perfiles demo y límites
+    ├── package.json
+    ├── package-lock.json
+    ├── src/            # Componentes, pantallas, datos demo y tipos
+    ├── public/         # Recursos estáticos
+    ├── tests/          # Pruebas de navegador
+    ├── docs/           # Documentación funcional y de diseño del frontend
+    ├── scripts/        # Utilidades del frontend
+    └── .figma/make/    # Integración existente con Figma
+```
 
-## Inicio rápido
+Cuando se implemente, el backend se incorporará en `backend/`, al mismo nivel
+que `frontend/`, con su propio README, dependencias, configuración y pruebas.
+Por ahora no se crean un servicio ficticio ni archivos de configuración para
+una tecnología de backend que todavía no se ha elegido.
+
+## Ejecutar el frontend
+
+Requisitos: Node.js compatible con Vite 8 —verificado con Node.js 24— y npm.
 
 ```sh
 git clone https://github.com/KiritoHyrules/vigilant-tribble.git
-cd vigilant-tribble
+cd vigilant-tribble/frontend
 npm ci
 npm run dev -- --host 127.0.0.1 --port 5178 --strictPort
 ```
 
-Abrir <http://127.0.0.1:5178>. No se necesitan credenciales institucionales ni
-variables de entorno para ejecutar la demostración.
+Abrir <http://127.0.0.1:5178>. Los comandos de npm se ejecutan **dentro de
+`frontend/`**, no desde la raíz. No se necesita un backend ni un archivo `.env`
+para probar la demostración.
 
-## Comandos
+## Comprobar el frontend
 
-| Comando | Propósito |
-|---|---|
-| `npm run dev` | Iniciar el servidor de desarrollo |
-| `npm run typecheck` | Comprobar los tipos de la aplicación |
-| `npm run build` | Comprobar los tipos y generar la compilación en `dist/` |
-| `npm run preview` | Inspeccionar localmente la compilación generada |
-| `npm run test:e2e -- --workers=1 --reporter=line` | Ejecutar las pruebas de escritorio y móvil de forma serial |
-| `npm run format` | Aplicar el formateador; modifica archivos |
+Desde `frontend/`:
 
-Las pruebas inician el servidor en el puerto 5178 o reutilizan el existente.
-Antes de ejecutarlas, comprobar que cualquier servidor en ese puerto corresponde
-a este proyecto. No ejecutar suites simultáneas sobre la misma carpeta.
-
-## Estructura
-
-```text
-src/
-  main.tsx          # Entrada de React
-  Portal.tsx        # Portada, acceso y espacio de trabajo
-  App.tsx           # Coordinación de los flujos y del estado demo
-  components/       # Componentes visuales y asistencia compartida
-  views/            # Pantallas y formularios de cada flujo
-  data/             # Datos ficticios, catálogos y modelos del prototipo
-  types/            # Tipos compartidos independientes de la interfaz
-  *.css             # Estilos de portada y espacio de trabajo
-public/             # Recursos estáticos
-tests/              # Pruebas Playwright y comprobaciones con axe
-docs/               # Documentación funcional y de diseño
-scripts/            # Empaquetado para el flujo de Figma
-.figma/make/        # Integración utilizada por la configuración de Vite
+```sh
+npm run typecheck
+npm run build
+npm run test:e2e -- --workers=1 --reporter=line
 ```
 
-Los catálogos de `src/data/` no dependen de componentes visuales para sus tipos
-de navegación: los importan de `src/types/navigation.ts`. `AppShell` conserva
-sus exportaciones anteriores por compatibilidad. Se mantiene la organización
-actual sin añadir capas ni dependencias innecesarias.
+Las pruebas de navegador requieren Google Chrome. La compilación se genera en
+`frontend/dist/`; no se incluye en Git. Para inspeccionarla localmente después
+de compilar, ejecutar `npm run preview` desde `frontend/`.
 
-## Acceso de demostración
+## Documentación
 
-Todas las cuentas siguientes usan la contraseña pública `trasu-demo`:
+- [Frontend: estructura, ejecución, pruebas y cuentas demo](frontend/README.md).
+- [Contribución y commits](CONTRIBUTING.md).
+- [Contexto y límites del producto](frontend/PRODUCT.md).
+- [Criterios de diseño](frontend/DESIGN.md).
 
-| Perfil | Usuario |
-|---|---|
-| Analista | `demo.analista` |
-| Supervisor | `demo.supervisor` |
-| Revisor | `demo.revisor` |
-| Vocal | `demo.vocal` |
-| Personal documentario | `demo.documentario` |
-| Soporte | `demo.soporte` |
-| Auditor | `demo.auditor` |
+## Alcance y seguridad
 
-No introducir contraseñas ni datos institucionales reales. El selector de perfiles
-y los permisos simulados no son mecanismos de seguridad para producción.
-
-## Verificación de esta entrega
-
-- `npm run typecheck`: correcto.
-- `npm run build`: correcto.
-- Suite Playwright serial: **74 pruebas correctas**, entre escritorio y móvil.
-
-La suite cubre acceso demo, perfiles, orientación contextual y flujos de trabajo.
-Las comprobaciones con axe se limitan a los estados probados; no constituyen
-una certificación integral de accesibilidad. La primera ejecución se interrumpió
-por el límite de tiempo del comando; la ejecución completa posterior terminó
-correctamente.
-
-Vite advierte de dos incompatibilidades futuras en su configuración: `__dirname`
-y una importación JSON sin atributos. No impiden la compilación actual y no se
-modificaron como parte de esta reorganización.
-
-## Documentación y mantenimiento
-
-- [Guía de contribución](CONTRIBUTING.md): criterios y comprobaciones para cambios.
-- [Contexto y límites del producto](PRODUCT.md).
-- [Identidad y criterios de diseño](DESIGN.md).
-- [Asistencia de pantalla](docs/screen-assistance.md).
-- [Evidencia histórica de interacción](docs/interaction-evidence.md).
-- [Historial de entregas](DELIVERY.md): resultados anteriores, no sustituyen la
-  verificación indicada arriba.
-
-La integración con Figma se conserva: `vite.config.ts` utiliza
-`.figma/make/site.json`. Los scripts de publicación de Figma no forman parte del
-inicio local ni de la subida del código a GitHub.
-
-Dependencias, compilaciones, resultados de pruebas, archivos de entorno y
-evidencias locales de `.impeccable/` quedan fuera de Git. Las capturas citadas
-en documentos históricos pueden no estar incluidas en el repositorio.
+Los expedientes, perfiles y operaciones son de demostración. No introducir
+contraseñas, credenciales ni datos institucionales reales. La separación de
+carpetas prepara el repositorio para evolucionar; no convierte el prototipo
+en un sistema listo para producción. Subir código a GitHub no despliega la
+aplicación ni ejecuta los scripts de publicación de Figma.

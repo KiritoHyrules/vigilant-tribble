@@ -1,13 +1,15 @@
-# Contribuir a TRASU Front
+# Contribuir a TRASU
 
-Mantener los cambios acotados y verificables, preservando el carácter de
-demostración de la aplicación y su integración existente con Figma.
+Mantener los cambios acotados y verificables. El frontend vive en `frontend/`;
+el futuro backend se incorporará en `backend/` con configuración independiente.
+Por ahora, preservar el carácter de demostración de la aplicación y su
+integración existente con Figma.
 
 ## Organización del código
 
-- Reutilizar los componentes de `src/components/` antes de duplicar controles.
-- Colocar las pantallas de flujo en `src/views/` y los catálogos demo en `src/data/`.
-- Definir tipos compartidos sin dependencias visuales en `src/types/`.
+- Reutilizar los componentes de `frontend/src/components/` antes de duplicar controles.
+- Colocar las pantallas de flujo en `frontend/src/views/` y los catálogos demo en `frontend/src/data/`.
+- Definir tipos compartidos sin dependencias visuales en `frontend/src/types/`.
 - No mover archivos únicamente para crear más carpetas: cada separación debe
   aclarar una responsabilidad o eliminar una dependencia innecesaria.
 - Mantener las pruebas junto al cambio funcional y actualizar la documentación
@@ -15,12 +17,19 @@ demostración de la aplicación y su integración existente con Figma.
 
 ## Antes de entregar un cambio
 
+Ejecutar las comprobaciones del frontend desde su propia carpeta:
+
 ```sh
+cd frontend
 npm run typecheck
 npm run build
 npm run test:e2e -- --workers=1 --reporter=line
 git diff --check
 ```
+
+No añadir dependencias del frontend a la raíz. Al desarrollar el backend,
+documentar sus requisitos y comprobaciones en `backend/README.md` sin mezclar
+sus dependencias con las de `frontend/`.
 
 Para cambios de comportamiento, reproducir primero el problema con una prueba
 determinista cuando sea posible y comprobar después que pasa con la corrección.
