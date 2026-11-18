@@ -1,0 +1,13 @@
+node_modules/
+dist/
+test-results/
+.env
+.env.*
+!.env.example
+.atl/
+.impeccable/
+.codegraph/
+playwright-report/
+coverage/
+*.log
+*.zip
