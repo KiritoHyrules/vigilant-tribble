@@ -112,6 +112,29 @@ describe('BE-008 audit schema', () => {
     expect(await cli.manager.countBy(AuditEvent, { correlationId })).toBe(0);
   });
 
+  it('returns 503 without storing evidence when mandatory audit validation fails', async () => {
+    const service = new AuditService(cli, new DenyAllAccessPolicy());
+    const correlationId = randomUUID();
+    const consultedId = randomUUID();
+    await expect(
+      service.mandatoryRead(
+        {
+          correlationId,
+          emitterCode: 'audit_service',
+          action: 'audit:read',
+          resourceType: 'audit_event',
+          occurredAt: new Date(),
+        },
+        () =>
+          Promise.resolve({
+            data: { protected: true },
+            consultedEventIds: [consultedId, consultedId],
+          }),
+      ),
+    ).rejects.toMatchObject({ status: 503 });
+    expect(await cli.manager.countBy(AuditEvent, { correlationId })).toBe(0);
+  });
+
   beforeAll(async () => {
     await cli.initialize();
   });

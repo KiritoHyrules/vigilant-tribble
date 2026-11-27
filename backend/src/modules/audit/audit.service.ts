@@ -229,8 +229,7 @@ export class AuditService {
         return result.data;
       });
     } catch (error) {
-      if (selected && !(error instanceof TypeError))
-        throw new ServiceUnavailableException();
+      if (selected) throw new ServiceUnavailableException();
       throw error;
     }
   }
