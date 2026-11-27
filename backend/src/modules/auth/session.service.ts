@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  ServiceUnavailableException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
@@ -21,7 +16,6 @@ function digest(token: string): Buffer {
 
 @Injectable()
 export class SessionService {
-  private loginChecks = 0;
   private readonly logger = new Logger(SessionService.name);
 
   constructor(
@@ -41,10 +35,8 @@ export class SessionService {
       kind: 'success',
       resultCode: 'success',
     };
-    if (Buffer.byteLength(password) > 512) throw new UnauthorizedException();
-    if (this.loginChecks >= 4) throw new ServiceUnavailableException();
-    this.loginChecks++;
     try {
+      if (Buffer.byteLength(password) > 512) throw new UnauthorizedException();
       const account = await this.db.manager
         .createQueryBuilder(Account, 'account')
         .addSelect('account.passwordHash')
@@ -98,8 +90,6 @@ export class SessionService {
         }
       }
       throw error;
-    } finally {
-      this.loginChecks--;
     }
   }
 

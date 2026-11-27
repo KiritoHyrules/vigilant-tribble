@@ -126,10 +126,32 @@ authenticated request. No account is provisioned by the demo seed.
 
 Browser writes, including login, require an exact `Origin` from `CORS_ORIGINS`
 and `X-TRASU-CSRF: 1`; configure an explicit frontend origin and send requests
-with credentials. The cookie uses `SameSite=Lax`, is `Secure` on HTTPS and
-in production, and expires after eight hours. Keep HTTPS termination and
-explicit origin configuration in production. Session authentication does
+with credentials. The cookie uses `SameSite=Lax`, is `Secure` by default,
+and expires after eight hours. For local HTTP only, set `NODE_ENV=development`,
+`AUTH_ALLOW_LOCAL_HTTP=true` and an explicit loopback `CORS_ORIGINS` (for example,
+`http://127.0.0.1:5173`). The peer, request host and HTTP origin must all be
+loopback. Do not expose this mode through a proxy or tunnel. Outside this mode,
+login and logout reject unapproved HTTP with `403` before changing session
+state. Production rejects HTTP CORS origins and the local opt-in.
+
+For the loopback HTTP listener behind a TLS terminator, configure
+`AUTH_LOOPBACK_PROXY_SECRET` as a random 32-byte secret encoded as 43 base64url
+characters. The trusted local proxy must accept only HTTPS for session traffic,
+strip client-supplied forwarding/proof headers, and set `X-Forwarded-Proto: https`
+and `X-TRASU-Proxy-Proof` to the configured secret on its private loopback hop.
+Never expose the proof to browsers or log it. Without this opt-in, forwarded
+headers do not establish HTTPS. The proxy and local HTTP modes are mutually
+exclusive.
+Session authentication does
 not grant access to a resource; consumers must still invoke `AccessPolicy`.
+
+Login returns `429` for overlapping attempts from one socket peer or more than
+12 admitted attempts in its one-minute window. It returns `503` when four
+checks are in flight or the bounded peer registry is full. There is no queue.
+Peer attribution uses the socket address, not forwarded headers: a shared
+proxy or NAT shares one budget. For a proxied deployment, enforce appropriate
+per-client limits at the trusted ingress; the application's global ceiling
+still applies. Traffic from multiple peers can still exhaust that ceiling.
 
 `case:read` allows a current holder with the matching server-side role; a
 matching role without the assignment is not enough. Search must apply the

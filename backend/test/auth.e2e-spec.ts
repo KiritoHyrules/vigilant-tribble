@@ -6,7 +6,7 @@ import {
   ServiceUnavailableException,
   type INestApplication,
 } from '@nestjs/common';
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 import { AppModule } from '../src/app.module';
 import { setupApp } from '../src/app.setup';
@@ -18,14 +18,18 @@ describe('Local authentication', () => {
   let db: DataSource;
   const origin = 'http://127.0.0.1:5173';
   const password = 'Synthetic fixture password only';
-  const login = `auth-${randomUUID()}`;
-  const actorId = randomUUID();
-  beforeAll(async () => {
+  let login: string;
+  let actorId: string;
+  beforeEach(async () => {
+    login = `auth-${randomUUID()}`;
+    actorId = randomUUID();
     const module = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
     app = module.createNestApplication<INestApplication<App>>();
     app.get(ConfigService).set('CORS_ORIGINS', origin);
+    app.get(ConfigService).set('NODE_ENV', 'development');
+    app.get(ConfigService).set('AUTH_ALLOW_LOCAL_HTTP', 'true');
     setupApp(app);
     await app.init();
     db = app.get(DataSource);
@@ -46,7 +50,7 @@ describe('Local authentication', () => {
       [actorId, login, await hashPassword(password)],
     );
   });
-  afterAll(async () => {
+  afterEach(async () => {
     await app?.close();
   });
 
@@ -65,6 +69,16 @@ describe('Local authentication', () => {
       .set('X-TRASU-CSRF', '1');
   }
 
+  function overrideConfig(values: Record<string, string>) {
+    const config = app.get(ConfigService);
+    const get = config.get.bind(config);
+    return jest
+      .spyOn(config, 'get')
+      .mockImplementation((key: string) =>
+        Object.hasOwn(values, key) ? values[key] : get<unknown>(key),
+      );
+  }
+
   async function signIn(): Promise<string> {
     const response = await post('login').send({ login, password }).expect(204);
     const cookies: unknown = response.headers['set-cookie'];
@@ -73,8 +87,146 @@ describe('Local authentication', () => {
     }
     expect(cookies[0]).toContain('HttpOnly');
     expect(cookies[0]).toContain('SameSite=Lax');
+    expect(cookies[0]).not.toMatch(/;\s*Secure(?:;|$)/);
     return cookies[0].split(';')[0];
   }
+
+  it('rejects unapproved HTTP before issuing a cookie or persisting a session', async () => {
+    const config = overrideConfig({
+      NODE_ENV: 'production',
+      AUTH_ALLOW_LOCAL_HTTP: 'false',
+    });
+    const before = await sessionFingerprint();
+    try {
+      for (const forwarded of [false, true]) {
+        const attempt = post('login').send({ login, password });
+        if (forwarded) {
+          attempt.set('X-Forwarded-Proto', 'https');
+          attempt.set('Forwarded', 'proto=https');
+        }
+        const response = await attempt.expect(403);
+        expect(response.headers['set-cookie']).toBeUndefined();
+        expect(await sessionFingerprint()).toEqual(before);
+      }
+    } finally {
+      config.mockRestore();
+    }
+  });
+
+  it('accepts HTTPS attested by the configured local proxy, not a forwarded header alone', async () => {
+    const secret = randomBytes(32).toString('base64url');
+    const httpsOrigin = 'https://app.example';
+    const config = overrideConfig({
+      NODE_ENV: 'production',
+      AUTH_ALLOW_LOCAL_HTTP: 'false',
+      AUTH_LOOPBACK_PROXY_SECRET: secret,
+      CORS_ORIGINS: httpsOrigin,
+    });
+    const before = await sessionFingerprint();
+    const forwardedLogin = () =>
+      post('login')
+        .set('Origin', httpsOrigin)
+        .set('X-Forwarded-Proto', 'https')
+        .send({ login, password });
+    try {
+      for (const proof of [undefined, randomBytes(32).toString('base64url')]) {
+        const attempt = forwardedLogin();
+        if (proof) attempt.set('X-TRASU-Proxy-Proof', proof);
+        const rejected = await attempt.expect(403);
+        expect(rejected.headers['set-cookie']).toBeUndefined();
+        expect(await sessionFingerprint()).toEqual(before);
+      }
+      const response = await forwardedLogin()
+        .set('X-TRASU-Proxy-Proof', secret)
+        .expect(204);
+      expect(response.headers['set-cookie']).toEqual([
+        expect.stringMatching(/;\s*HttpOnly; Secure; SameSite=Lax(?:;|$)/),
+      ]);
+      expect(await sessionFingerprint()).not.toEqual(before);
+    } finally {
+      config.mockRestore();
+    }
+  });
+
+  it('limits overlapping attempts from one peer and releases admission after failure', async () => {
+    let release!: () => void;
+    let entered!: () => void;
+    const waiting = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const ready = new Promise<void>((resolve) => {
+      entered = resolve;
+    });
+    const audit = app.get(AuditService);
+    const original = audit.recordUnsuccessful.bind(audit);
+    const spy = jest
+      .spyOn(audit, 'recordUnsuccessful')
+      .mockImplementationOnce(async (event) => {
+        entered();
+        await waiting;
+        return original(event);
+      });
+    const first = post('login')
+      .send({ login, password: 'incorrect' })
+      .then((response) => response);
+    try {
+      await ready;
+      await post('login').send({ login, password }).expect(429);
+    } finally {
+      release();
+      expect((await first).status).toBe(401);
+      spy.mockRestore();
+    }
+    await signIn();
+  });
+
+  it('records an oversized UTF-8 credential denial without identifying an account', async () => {
+    const secret = '界'.repeat(200);
+    const audit = app.get(AuditService);
+    const spy = jest.spyOn(audit, 'recordUnsuccessful');
+    try {
+      const response = await post('login')
+        .send({ login, password: secret })
+        .expect(401);
+      expect(response.headers['set-cookie']).toBeUndefined();
+      expect(spy).toHaveBeenCalledTimes(1);
+      const [event] = spy.mock.calls[0];
+      expect(event).toMatchObject({ action: 'auth:login', kind: 'denied' });
+      expect(event.actorId).toBeUndefined();
+      expect(event.resourceId).toBeUndefined();
+      const rows: unknown = await db.query(
+        `SELECT actor_id, resource_id, before_data, after_data FROM audit_event WHERE correlation_id = $1`,
+        [event.correlationId],
+      );
+      expect(rows).toEqual([
+        {
+          actor_id: null,
+          resource_id: null,
+          before_data: null,
+          after_data: null,
+        },
+      ]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('omits Secure only for explicitly enabled loopback development login and logout', async () => {
+    const response = await post('login').send({ login, password }).expect(204);
+    const cookies: unknown = response.headers['set-cookie'];
+    expect(cookies).toEqual([
+      expect.stringContaining('HttpOnly; SameSite=Lax'),
+    ]);
+    expect(cookies).toEqual([expect.not.stringMatching(/;\s*Secure(?:;|$)/)]);
+    if (!Array.isArray(cookies) || typeof cookies[0] !== 'string')
+      throw new Error('Missing cookie.');
+    const logout = await post('logout')
+      .set('Cookie', cookies[0].split(';')[0])
+      .expect(204);
+    expect(logout.headers['set-cookie']).toEqual([
+      expect.not.stringMatching(/;\s*Secure(?:;|$)/),
+    ]);
+  });
 
   it('authenticates against stored hashes and resolves current participant and roles', async () => {
     await post('login').send({ login, password: 'incorrect' }).expect(401);
