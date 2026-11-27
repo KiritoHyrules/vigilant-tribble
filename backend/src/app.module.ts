@@ -9,6 +9,7 @@ import { HealthController } from './health/health.controller';
 import { AuditModule } from './modules/audit/audit.module';
 import { IdentityPersistenceModule } from './modules/auth/identity-persistence.module';
 import { CasePersistenceModule } from './modules/cases/case-persistence.module';
+import { CasesModule } from './modules/cases/cases.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CasePersistenceModule } from './modules/cases/case-persistence.module';
     IdentityPersistenceModule,
     CasePersistenceModule,
     AuditModule,
+    CasesModule,
   ],
   controllers: [HealthController],
 })

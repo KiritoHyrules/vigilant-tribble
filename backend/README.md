@@ -149,3 +149,15 @@ Automated follow-ups: exercise seed rejection for unsupported environments,
 non-loopback hosts and unmarked databases; run the seed twice and verify
 transactional rollback on a conflicting reference; and exercise migration
 apply, revert and reapply from a disposable empty database in CI.
+
+## Módulo `cases` (BE-003 / BE-007b / BE-011)
+
+Contrato de referencia: [`contracts/cases-assignments-v1.md`](../contracts/cases-assignments-v1.md).
+Migraciones incrementales propuestas (pendientes de secuencia final por I1 y ejecución sobre PostgreSQL 17):
+- `src/database/migrations/1795880000000-CasesIntakeAndIncidences.ts` (`case_intake`, `case_incidence`, `case_institutional_document_ref`)
+- `src/database/migrations/1795920000000-ReassignmentRequests.ts` (`reassignment_request`, `reassignment_stale_attempt`)
+
+Rutas expuestas bajo `/api/v1` (protegidas por `AuthenticatedGuard` y `AccessPolicy` denegando por defecto hasta BE-007a):
+- `POST /api/v1/cases/incorporate`, `GET /api/v1/cases`, `GET /api/v1/cases/intake`, `GET /api/v1/cases/:id`
+- `POST /api/v1/cases/:id/assignments`, `POST /api/v1/cases/:id/reassignment-requests`
+- `GET /api/v1/reassignment-requests`, `GET /api/v1/reassignment-requests/:id`, `POST /api/v1/reassignment-requests/:id/decision`, `POST /api/v1/reassignment-requests/:id/treatment`
