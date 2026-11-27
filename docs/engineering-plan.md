@@ -10,13 +10,13 @@ Estado verificado el 2026-11-27: **1 Done, 4 Ready, 13 Backlog**. Este es el ún
 
 | Tarjeta | Responsable | Estado | Evidencia o condición de entrada |
 |---|---|---|---|
-| [BE-001](https://github.com/KiritoHyrules/vigilant-tribble/issues/2) | I1 | Ready | Abierta; el scaffold ya está disponible. |
+| [BE-001](https://github.com/KiritoHyrules/vigilant-tribble/issues/2) | I1 | Done | Contrato ratificado e integrado mediante [PR #22](https://github.com/KiritoHyrules/vigilant-tribble/pull/22); Issue cerrado. |
 | [BE-002](https://github.com/KiritoHyrules/vigilant-tribble/issues/3) | I2 | Done | [Aprobación de I1](https://github.com/KiritoHyrules/vigilant-tribble/pull/20#pullrequestreview-6083824236); [PR #20](https://github.com/KiritoHyrules/vigilant-tribble/pull/20) fusionado por squash en [`2466758`](https://github.com/KiritoHyrules/vigilant-tribble/commit/2466758cd36a8b1be938b2a12df20c5fd51d55d6); Issue cerrado por `Closes #3`. |
 | [BE-003](https://github.com/KiritoHyrules/vigilant-tribble/issues/4) | I3 | Ready | Abierta; puede contrastar el contrato de expedientes con la base integrada. |
 | [BE-004](https://github.com/KiritoHyrules/vigilant-tribble/issues/5) | I4 | Ready | Abierta; puede avanzar el contrato documental. |
 | [BE-005](https://github.com/KiritoHyrules/vigilant-tribble/issues/6) | I5 | Ready | Abierta; puede avanzar el contrato de auditoría y adaptadores. |
-| [BE-006](https://github.com/KiritoHyrules/vigilant-tribble/issues/7) | I1, con I2/I3 | Backlog | G1; diccionario y restricciones mínimas ratificados. |
-| [BE-007a](https://github.com/KiritoHyrules/vigilant-tribble/issues/8) | I2 | Backlog | G1 y parte de identidad de BE-006. |
+| [BE-006](https://github.com/KiritoHyrules/vigilant-tribble/issues/7) | I1, con I2/I3 | Done | Migración, semilla ficticia y pruebas integradas con el PR que cierra el Issue #7. |
+| [BE-007a](https://github.com/KiritoHyrules/vigilant-tribble/issues/8) | I2 | Ready | G1 y tablas de identidad de BE-006 integrados. |
 | [BE-007b](https://github.com/KiritoHyrules/vigilant-tribble/issues/9) | I3 | Backlog | G1, BE-003, BE-006 y política de I2. |
 | [BE-008](https://github.com/KiritoHyrules/vigilant-tribble/issues/10) | I5 | Backlog | G1 y esquema de auditoría aprobado a partir de BE-005. |
 | [BE-009a](https://github.com/KiritoHyrules/vigilant-tribble/issues/11) | I4 | Backlog | G1, contrato de BE-004, IDs y FK aprobados para persistencia. |
@@ -29,7 +29,7 @@ Estado verificado el 2026-11-27: **1 Done, 4 Ready, 13 Backlog**. Este es el ún
 | [BE-015](https://github.com/KiritoHyrules/vigilant-tribble/issues/18) | I1–I5, por módulo | Backlog | Flujo implementado y contrato aprobado por módulo. |
 | [BE-016](https://github.com/KiritoHyrules/vigilant-tribble/issues/19) | I1 e I2 | Backlog | G2 y autorización de proveedor, presupuesto y acceso. |
 
-**G1 sigue pendiente:** el scaffold ya está integrado, pero faltan los contratos mínimos de identidad, expediente y auditoría, y el diccionario y restricciones compartidas. No adelantar la persistencia de dominio por la sola integración de BE-002.
+**G1 acreditado:** scaffold integrado en [PR #20](https://github.com/KiritoHyrules/vigilant-tribble/pull/20), PostgreSQL 17 verificado en una instancia aislada y [contrato de identidad, expediente y auditoría](../contracts/data-foundation-v1.md) ratificado e integrado en [PR #22](https://github.com/KiritoHyrules/vigilant-tribble/pull/22). G1 no sustituye las dependencias específicas de cada tarjeta.
 
 **Seguimiento de I2:** la auditoría de BE-002 registró 19 alertas moderadas de desarrollo y 0 de producción. No se realizaron actualizaciones adicionales ni se repitieron esas pruebas para consolidar el tablero.
 
@@ -72,7 +72,7 @@ Las fichas de esta sección describen el alcance original; el estado vigente se 
 Objetivo: acordar un contrato mínimo, tener NestJS arrancable y preparar pruebas/implementación sin colisiones. Estimaciones orientativas; 15 horas-persona brutas, no comprometer más de lo que pase los gates.
 
 ### BE-001 — I1 — Datos compartidos v0 (2–3 h; revisor I3)
-**Ready.** Leer alcance, RF y RN; extraer con los demás los campos efectivamente usados por vistas, tipos y datos demo del frontend. Definir IDs, referencia externa, participantes/roles, expediente, responsabilidades por ámbito, incidencia, historial y eventos. Proponer modelo incremental, restricciones y diccionario; identificar relación y cardinalidad justificada, no copiar tabla previa. Crear `compose.yaml` para PostgreSQL local y `.env.example` sin secretos (acordar ubicación con I2), instrucciones de conexión y arranque. Acordar con I2/I3 el esquema mínimo y con I5 el contrato de auditoría. Dejar entidades y migraciones de dominio para tras el scaffold si aún no está integrado. **Aceptación:** PostgreSQL arranca, conexión comprobada, esquema mínimo y contratos acordados en PR, no aparecen datos reales. **Desbloquea:** BE-006, 007, 008, 010.
+**Done.** El [contrato ratificado](../contracts/data-foundation-v1.md) documenta el esquema, las restricciones compartidas y la evidencia de PostgreSQL aislado. Las dependencias de implementación restantes aparecen en la sección 5.
 
 ### BE-002 — I2 — Inicializar backend y CI (2–3 h; revisor I1)
 **Ready.** Único responsable del scaffold. Crear NestJS dentro de `backend/`, sin inicializar Git anidado. Configurar TypeScript, scripts build/test/lint, `ConfigModule` con validación de variables, prefijo API, `/health`, OpenAPI y TypeORM con conexión por env; deshabilitar sincronización automática. Crear test de health, README y workflow de CI backend con PostgreSQL de prueba cuando corresponda. Definir `CurrentActor` (id y roles) y firma inicial de política de autorización con I3/I4/I5. Usar placeholders que fallen cerrados, nunca autenticación ficticia en endpoints protegidos. PR temprano del esqueleto para desbloquear a otros. **Aceptación:** `npm ci`, `npm run build`, tests y health ejecutados; backend separado; config documentada. **Desbloquea:** BE-006–011. Si falta tiempo, entregar scaffold/health primero y abrir tarjeta para CI/config restante.
@@ -112,7 +112,7 @@ Cada tarjeta se subdivide si supera una sesión. Estimaciones de esfuerzo no son
 
 ## 6. Diseño de datos por incrementos: responsabilidad I1
 
-**Seguimiento de BE-001 ([Issue #2](https://github.com/KiritoHyrules/vigilant-tribble/issues/2)):** el [contrato de fundamentos de datos v1](../contracts/data-foundation-v1.md) es el entregable de ratificación. BE-001 permanece abierta durante revisión cruzada e integración; la publicación del PR no acredita G1 ni cambia el estado de otras tarjetas.
+El [contrato de fundamentos de datos v1](../contracts/data-foundation-v1.md) define las siete tablas aprobadas para BE-006. Las tablas de cuentas, incorporación, decisiones y auditoría pertenecen a sus respectivas tarjetas.
 
 No diseñar a ciegas todo el ERD. Base candidata de conceptos (no tablas aprobadas): identidad/rol/sesión; expediente/referencia/clasificación/incidencia; asignación por ámbito/solicitud/decisión; proyecto/versiones/revisiones/observaciones/atenciones; eventos de plazos y calendario; intercambio/intento/derivación; eventos auditables y mantenimiento. Cada responsable aporta evidencia del frontend y RF/RN, I1 concilia y aprueba el esquema de cada incremento. La BD garantiza lo que puede garantizar declarativamente (PK, FK, UNIQUE, CHECK); el servicio verifica atribuciones, invariantes que cruzan relaciones y transiciones dentro de transacciones. Evitar duplicar estado derivable sin justificación. No usar cascadas de borrado sobre historial. Para responsabilidad vigente por ámbito evaluar restricción única parcial; para duplicidad de expediente, definir equivalencia institucional antes de imponer unicidad; para decisiones concurrentes, transacción y bloqueo o versión optimista. No imponer cardinalidad o campos sin evidencia.
 

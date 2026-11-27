@@ -110,3 +110,42 @@ Riesgo residual: `npm audit` completo mantiene alertas moderadas en herramientas
 { "statusCode": 400, "error": "Bad Request", "message": "...", "path": "/api/v1/...", "timestamp": "..." }
 ```
 Los errores 5xx no exponen detalles internos.
+
+## Data foundation (BE-006)
+
+The first domain migration creates the seven tables defined in the
+[BE-001 contract](https://github.com/KiritoHyrules/vigilant-tribble/pull/22).
+Nest and the migration CLI load the same module-owned entities. PostgreSQL
+owns the stored reference match key and both partial unique indexes.
+Synchronization and automatic migrations remain disabled.
+
+From `backend/`, against an isolated PostgreSQL 17 database:
+
+```sh
+npm run migration:show
+npm run migration:run
+npm run test:e2e
+```
+
+`npm run seed:demo` adds fictitious rows with stable keys; repeating it does not
+duplicate them. It requires an explicit `NODE_ENV=development` or `NODE_ENV=test`
+and a loopback PostgreSQL host. A tunnel can also use loopback, so the seed
+checks the connected database itself before writing. As the owner of a verified,
+disposable PostgreSQL database only, replace `trasu_demo` with its name and run:
+
+```sql
+COMMENT ON DATABASE trasu_demo IS 'trasu:disposable-demo';
+```
+
+Do not mark a shared or working database. The seed refuses unmarked databases
+and does not create accounts or passwords.
+
+`npm run migration:revert` drops the foundation tables and their contents.
+Reapplying the migration recreates empty tables; it does not recover data.
+Test rollback only against a disposable database. Do not use it to repair a
+database that contains real or shared data.
+
+Automated follow-ups: exercise seed rejection for unsupported environments,
+non-loopback hosts and unmarked databases; run the seed twice and verify
+transactional rollback on a conflicting reference; and exercise migration
+apply, revert and reapply from a disposable empty database in CI.
