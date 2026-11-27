@@ -9,6 +9,7 @@ import {
   Min,
   validateSync,
 } from 'class-validator';
+import { parseCorsOrigins } from './cors';
 
 export class EnvironmentVariables {
   @IsIn(['development', 'test', 'production'])
@@ -30,11 +31,11 @@ export class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
-  POSTGRES_DB: string;
+  POSTGRES_DB: string = 'trasu_dev';
 
   @IsString()
   @IsNotEmpty()
-  POSTGRES_USER: string;
+  POSTGRES_USER: string = 'trasu_dev';
 
   @IsString()
   @IsNotEmpty()
@@ -58,8 +59,6 @@ export function validateEnv(
     const names = errors.map((e) => e.property).join(', ');
     throw new Error(`Variables de entorno inválidas o ausentes: ${names}`);
   }
-  if (env.CORS_ORIGINS.split(',').some((o) => o.trim() === '*')) {
-    throw new Error('CORS_ORIGINS no admite "*": declarar orígenes explícitos');
-  }
+  parseCorsOrigins(env.CORS_ORIGINS);
   return env;
 }

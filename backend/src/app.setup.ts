@@ -2,6 +2,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpErrorFilter } from './common/errors/http-error.filter';
+import { parseCorsOrigins } from './config/cors';
 import type { EnvironmentVariables } from './config/env.validation';
 
 /** Configuración HTTP compartida por el arranque y las pruebas e2e. */
@@ -20,11 +21,7 @@ export function setupApp(app: INestApplication): void {
   app.useGlobalFilters(new HttpErrorFilter());
   app.enableShutdownHooks();
 
-  const origins = config
-    .get('CORS_ORIGINS', { infer: true })
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean);
+  const origins = parseCorsOrigins(config.get('CORS_ORIGINS', { infer: true }));
   if (origins.length > 0) {
     app.enableCors({ origin: origins, credentials: true });
   }

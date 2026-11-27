@@ -1,11 +1,11 @@
 import { join } from 'node:path';
-import type { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
+import type { DataSourceOptions } from 'typeorm';
 import type { EnvironmentVariables } from '../config/env.validation';
 
+type PostgresOptions = Extract<DataSourceOptions, { type: 'postgres' }>;
+
 /** Configuración única para la aplicación y la CLI de migraciones. */
-export function databaseOptions(
-  env: EnvironmentVariables,
-): PostgresConnectionOptions {
+export function databaseOptions(env: EnvironmentVariables): PostgresOptions {
   return {
     type: 'postgres',
     host: env.POSTGRES_HOST,
