@@ -14,18 +14,18 @@ Estado verificado el 2026-11-27: **1 Done, 4 Ready, 13 Backlog**. Este es el ún
 | [BE-002](https://github.com/KiritoHyrules/vigilant-tribble/issues/3) | I2 | Done | [Aprobación de I1](https://github.com/KiritoHyrules/vigilant-tribble/pull/20#pullrequestreview-6083824236); [PR #20](https://github.com/KiritoHyrules/vigilant-tribble/pull/20) fusionado por squash en [`2466758`](https://github.com/KiritoHyrules/vigilant-tribble/commit/2466758cd36a8b1be938b2a12df20c5fd51d55d6); Issue cerrado por `Closes #3`. |
 | [BE-003](https://github.com/KiritoHyrules/vigilant-tribble/issues/4) | I3 | Ready | Abierta; puede contrastar el contrato de expedientes con la base integrada. |
 | [BE-004](https://github.com/KiritoHyrules/vigilant-tribble/issues/5) | I4 | Ready | Abierta; puede avanzar el contrato documental. |
-| [BE-005](https://github.com/KiritoHyrules/vigilant-tribble/issues/6) | I1 (temporal; antes I5) | In progress | [Contrato candidato](../contracts/audit-exchange-operations-v1.md); pendiente de revisión de I2 y aprobación del esquema. |
+| [BE-005](https://github.com/KiritoHyrules/vigilant-tribble/issues/6) | I1 (temporal; antes I5) | Done | [Contrato ratificado](../contracts/audit-exchange-operations-v1.md), integrado en [PR #24](https://github.com/KiritoHyrules/vigilant-tribble/pull/24); Issue cerrado. |
 | [BE-006](https://github.com/KiritoHyrules/vigilant-tribble/issues/7) | I1, con I2/I3 | Done | Migración, semilla ficticia y pruebas integradas con el PR que cierra el Issue #7. |
 | [BE-007a](https://github.com/KiritoHyrules/vigilant-tribble/issues/8) | I2 | Ready | G1 y tablas de identidad de BE-006 integrados. |
 | [BE-007b](https://github.com/KiritoHyrules/vigilant-tribble/issues/9) | I3 | Backlog | G1, BE-003, BE-006 y política de I2. |
-| [BE-008](https://github.com/KiritoHyrules/vigilant-tribble/issues/10) | I1 (temporal; antes I5) | Backlog | G1 acreditado; pendiente el esquema de auditoría aprobado a partir de BE-005. |
+| [BE-008](https://github.com/KiritoHyrules/vigilant-tribble/issues/10) | I1 (temporal; antes I5) | Done | Migración y servicio de auditoría incorporados por el PR que cierra el Issue #10; consumo HTTP de identidad y expedientes en las tarjetas respectivas. |
 | [BE-009a](https://github.com/KiritoHyrules/vigilant-tribble/issues/11) | I4 | Backlog | G1, contrato de BE-004, IDs y FK aprobados para persistencia. |
 | [BE-010](https://github.com/KiritoHyrules/vigilant-tribble/issues/12) | I1, con I2/I3 | Backlog | BE-007a, BE-007b y BE-008. |
 | [BE-011](https://github.com/KiritoHyrules/vigilant-tribble/issues/13) | I3 | Backlog | BE-007b, BE-008 y transiciones de BE-003. |
 | [BE-009b](https://github.com/KiritoHyrules/vigilant-tribble/issues/14) | I4 | Backlog | BE-009a, BE-011, BE-008 y contrato de BE-004. |
-| [BE-012](https://github.com/KiritoHyrules/vigilant-tribble/issues/15) | I5 | Backlog | BE-005 y BE-008; BE-009b solo para salida ordinaria. |
+| [BE-012](https://github.com/KiritoHyrules/vigilant-tribble/issues/15) | I5 | Ready | Puede comenzar el trabajo que no requiere la salida ordinaria. La salida ordinaria sigue pendiente de BE-009b. |
 | [BE-013](https://github.com/KiritoHyrules/vigilant-tribble/issues/16) | I1 | Backlog | BE-007b y BE-011; BE-009b solo para pendientes documentales. |
-| [BE-014](https://github.com/KiritoHyrules/vigilant-tribble/issues/17) | I5 | Backlog | BE-008 y contrato de mantenimiento de BE-005. |
+| [BE-014](https://github.com/KiritoHyrules/vigilant-tribble/issues/17) | I5 | Ready | BE-008 y contrato de mantenimiento de BE-005 integrados; mantener autorización por operación. |
 | [BE-015](https://github.com/KiritoHyrules/vigilant-tribble/issues/18) | I1–I5, por módulo | Backlog | Flujo implementado y contrato aprobado por módulo. |
 | [BE-016](https://github.com/KiritoHyrules/vigilant-tribble/issues/19) | I1 e I2 | Backlog | G2 y autorización de proveedor, presupuesto y acceso. |
 
@@ -84,7 +84,7 @@ Objetivo: acordar un contrato mínimo, tener NestJS arrancable y preparar prueba
 **Ready.** Inspeccionar editor/documentos y revisiones del frontend, formatos y estructura de observaciones. Mapear UC-05/06/07 y RF-008–013. Especificar identidad de versión, concurrencia, contenido/almacenamiento, anclaje a sección/párrafo, ruta revisor→vocal o directa cuando aplique, observaciones y subsanación parcial; conservar hash y trazabilidad requerida por RF-012. Proponer entidades y restricciones al I1, permisos al I2 y eventos al I5. Preparar tests de versión inmutable, ruta obligatoria, no herencia y observación parcial. **Aceptación:** contrato y transiciones documentados sin modificar UI; incertidumbres de anclaje o formato identificadas; BE-009 desbloqueado cuando contratos comunes estén integrados.
 
 ### BE-005 — I1 (temporal) — Contrato auditoría y adaptadores (2–3 h; revisor I2)
-**Ready.** Mapear UC-09–13 y RF-016–024, contrastar las pantallas de intercambios, evidencia y mantenimiento. Definir `recordEvent` con actor, tipo, recurso, fecha, antes/después mínimo, resultado y correlación; evitar secretos/contenido documental en logs. Acordar transacción compartida y forma de consultar evidencia autorizada. Proponer adaptador externo simulado de éxito, timeout y error con clave idempotente y registro de intentos. Preparar tests de fallo sin éxito falso, reintento y auditoría de consulta. **Aceptación:** contratos comunes aprobados, esquema propuesto al I1 y límites del simulador explícitos. No inventar API institucional. Desbloquea BE-008 y BE-012.
+**Done.** El [contrato integrado](../contracts/audit-exchange-operations-v1.md) define auditoría, el esquema aprobado y los límites del simulador y de mantenimiento. No incorpora una API institucional.
 
 **Gate G1:** scaffold único integrado en main, BD local arrancable, contrato mínimo de identidad/expediente/auditoría aprobado y tareas específicas con archivos reales identificados. No hace falta que el modelo completo esté finalizado. Si no se supera, nadie genera una arquitectura alternativa: se resuelve el bloqueo concreto y los demás avanzan con tests, DTO y lógica pura de su dominio.
 
