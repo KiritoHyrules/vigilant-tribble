@@ -1,5 +1,6 @@
 # Contratos API
 
+- [Expedientes y asignaciones (BE-003)](cases-assignments-v1.md): contrato de incorporación, consulta autorizada, incidencias y reasignaciones para BE-007b y BE-011.
 - [Auditoría, intercambios y mantenimiento (BE-005)](audit-exchange-operations-v1.md): contrato para revisión cruzada; no es OpenAPI ejecutable.
 
 Durante BE-003/004/005, documentar operaciones con método, ruta candidata, actor/atribución, DTO, respuesta, errores, transiciones y pruebas. Acordar los datos compartidos con I1, autorización con I2 y auditoría con I5. No derivar permisos de los mocks del frontend.
