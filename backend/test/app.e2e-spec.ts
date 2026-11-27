@@ -84,11 +84,11 @@ describe('API (e2e, PostgreSQL real)', () => {
   it('401 sin actor en un endpoint protegido', () =>
     request(app.getHttpServer()).get('/api/v1/probe/protected').expect(401));
 
-  it('403 con actor: la política provisional deniega', () =>
+  it('401 con actor inyectado sin sesión autenticada', () =>
     request(app.getHttpServer())
       .get('/api/v1/probe/protected')
       .set('x-test-actor', '1')
-      .expect(403));
+      .expect(401));
 
   it('400 ante campos no declarados', () =>
     request(app.getHttpServer())

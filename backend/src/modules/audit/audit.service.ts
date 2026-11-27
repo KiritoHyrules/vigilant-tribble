@@ -11,6 +11,8 @@ const resources: Readonly<Record<string, string>> = {
   'reassignment:request': 'reassignment_request',
   'reassignment:decide': 'reassignment_request',
   'audit:read': 'audit_event',
+  'auth:login': 'account',
+  'auth:logout': 'account',
 };
 const results: Record<AuditKind, readonly string[]> = {
   success: ['success'],

@@ -111,6 +111,41 @@ Riesgo residual: `npm audit` completo mantiene alertas moderadas en herramientas
 ```
 Los errores 5xx no exponen detalles internos.
 
+## Local authentication (BE-007a)
+
+The account is linked to one participant; the session stores a SHA-256 digest
+of a random 256-bit token, not the token. Passwords use salted scrypt. The
+current participant and role memberships are read from PostgreSQL on each
+authenticated request. No account is provisioned by the demo seed.
+
+| Operation | Result |
+|---|---|
+| `POST /api/v1/auth/login` with `login` and `password` | `204` and the `trasu_session` HttpOnly cookie, or `401` for invalid credentials. |
+| `GET /api/v1/auth/session` | The server-resolved `{ id, roles }` or `401` for absent, expired or revoked sessions. |
+| `POST /api/v1/auth/logout` | `204`, revokes the session and clears its cookie. |
+
+Browser writes, including login, require an exact `Origin` from `CORS_ORIGINS`
+and `X-TRASU-CSRF: 1`; configure an explicit frontend origin and send requests
+with credentials. The cookie uses `SameSite=Lax`, is `Secure` on HTTPS and
+in production, and expires after eight hours. Keep HTTPS termination and
+explicit origin configuration in production. Session authentication does
+not grant access to a resource; consumers must still invoke `AccessPolicy`.
+
+`case:read` allows a current holder with the matching server-side role; a
+matching role without the assignment is not enough. Search must apply the
+same predicate before pagination and counting, and case detail must map a
+denial to the same `404` as a missing case. No case write attribution is
+created here. Explicit deployment allowlists `OPERATIONS_OPERATOR_IDS`
+and `AUDIT_READER_IDS` contain comma-separated participant UUIDs and are
+empty by default. Operations require the `support` membership as well; for
+existing interventions, only an attributed opener can verify, close or read
+its intervention. Audit reads require the `auditor` membership and an exact
+existing event. These settings do not create accounts or memberships.
+
+Successful login/logout and their audit events commit together. Credential
+denials are recorded separately without attempting to infer an actor from
+the submitted login. No password, raw token or request body is audit evidence.
+
 ## Data foundation (BE-006)
 
 The first domain migration creates the seven tables defined in the

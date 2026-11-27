@@ -1,0 +1,13 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Account, AuthSession } from './session.entity';
+import { SessionController } from './session.controller';
+import { SessionService } from './session.service';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Account, AuthSession])],
+  controllers: [SessionController],
+  providers: [SessionService],
+  exports: [SessionService],
+})
+export class SessionModule {}

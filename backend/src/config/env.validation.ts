@@ -5,11 +5,15 @@ import {
   IsInt,
   IsNotEmpty,
   IsString,
+  Matches,
   Max,
   Min,
   validateSync,
 } from 'class-validator';
 import { parseCorsOrigins } from './cors';
+
+const participantIds =
+  /^(?:\s*[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\s*(?:,\s*[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\s*)*)?$/i;
 
 export class EnvironmentVariables {
   @IsIn(['development', 'test', 'production'])
@@ -44,6 +48,12 @@ export class EnvironmentVariables {
   /** Orígenes permitidos, separados por coma. Vacío: sin CORS. */
   @IsString()
   CORS_ORIGINS: string = '';
+
+  @Matches(participantIds)
+  OPERATIONS_OPERATOR_IDS: string = '';
+
+  @Matches(participantIds)
+  AUDIT_READER_IDS: string = '';
 }
 
 export function validateEnv(
