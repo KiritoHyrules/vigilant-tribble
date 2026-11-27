@@ -6,6 +6,7 @@ import { ENV_FILES } from './config/env.files';
 import { EnvironmentVariables, validateEnv } from './config/env.validation';
 import { databaseOptions } from './database/database.options';
 import { HealthController } from './health/health.controller';
+import { AuditModule } from './modules/audit/audit.module';
 import { IdentityPersistenceModule } from './modules/auth/identity-persistence.module';
 import { CasePersistenceModule } from './modules/cases/case-persistence.module';
 
@@ -35,6 +36,7 @@ import { CasePersistenceModule } from './modules/cases/case-persistence.module';
     SecurityModule,
     IdentityPersistenceModule,
     CasePersistenceModule,
+    AuditModule,
   ],
   controllers: [HealthController],
 })
