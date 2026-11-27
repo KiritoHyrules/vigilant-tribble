@@ -1,5 +1,7 @@
 # Arquitectura técnica — TRASU
 
+El [contrato de fundamentos de datos v1](../contracts/data-foundation-v1.md) reúne las decisiones de G1 ratificadas por I1 y delimita la primera migración; su publicación no adelanta la implementación de dominio.
+
 Estado: decisión de dirección para la etapa de construcción; no evidencia de implementación. Monolito modular, monorepositorio existente. Frontend React/TypeScript/Vite sin rediseño; backend NestJS/TypeScript con npm independiente, Node 24 LTS, PostgreSQL y TypeORM. Jest/Supertest para backend; Playwright existente para navegador; OpenAPI para contratos REST. Fijar versiones exactas compatibles en lockfiles durante bootstrap.
 
 ## Límites
