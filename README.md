@@ -4,8 +4,8 @@ Repositorio del sistema TRASU, organizado para mantener el frontend y el futuro
 backend en el mismo lugar, con dependencias y configuraciones independientes.
 
 Actualmente contiene **TRASU Front**, un prototipo interactivo con React,
-TypeScript y Vite. El backend todavía no está implementado: no hay API,
-autenticación real ni persistencia institucional.
+TypeScript y Vite. El backend tiene solo su base técnica en NestJS: no hay
+endpoints de negocio, autenticación real ni persistencia institucional.
 
 ## Contenido del repositorio
 
@@ -18,12 +18,13 @@ autenticación real ni persistencia institucional.
 │   │   └── task.md
 │   ├── pull_request_template.md
 │   └── workflows/
+│       ├── backend-ci.yml
 │       └── frontend-ci.yml
 ├── .gitignore
 ├── AGENTS.md
 ├── CONTRIBUTING.md
 ├── README.md
-├── backend/README.md
+├── backend/           # API NestJS
 ├── compose.yaml
 ├── contracts/README.md
 ├── docs/
@@ -74,7 +75,7 @@ de compilar, ejecutar `npm run preview` desde `frontend/`.
 
 ## Construcción del backend
 
-El backend se incorporará en `backend/` con dependencias independientes del
+El backend está en `backend/` con dependencias independientes del
 frontend. Stack decidido: NestJS, TypeScript, Node 24 LTS, PostgreSQL y TypeORM.
 Consultar [arquitectura](docs/architecture.md), [plan técnico](docs/engineering-plan.md),
 [contratos](contracts/README.md) y [estado del backend](backend/README.md).
@@ -105,8 +106,8 @@ El backend y sus migraciones se incorporarán con sus tarjetas.
 Leer [AGENTS.md](AGENTS.md) antes de utilizar agentes. El tablero GitHub Projects
 será el estado operativo de las tareas; el plan técnico es la referencia de
 construcción. La CI frontend comprueba instalación reproducible, tipos y
-compilación. Las pruebas de navegador siguen siendo obligatorias en local hasta
-que se configure y verifique CI e2e. La CI backend se incorporará con BE-002.
+compilación; la CI backend, lint, compilación, pruebas y migraciones. Las pruebas de navegador siguen siendo obligatorias en local hasta
+que se configure y verifique CI e2e.
 
 ## Documentación
 
