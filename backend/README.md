@@ -111,6 +111,63 @@ Riesgo residual: `npm audit` completo mantiene alertas moderadas en herramientas
 ```
 Los errores 5xx no exponen detalles internos.
 
+## Local authentication (BE-007a)
+
+The account is linked to one participant; the session stores a SHA-256 digest
+of a random 256-bit token, not the token. Passwords use salted scrypt. The
+current participant and role memberships are read from PostgreSQL on each
+authenticated request. No account is provisioned by the demo seed.
+
+| Operation | Result |
+|---|---|
+| `POST /api/v1/auth/login` with `login` and `password` | `204` and the `trasu_session` HttpOnly cookie, or `401` for invalid credentials. |
+| `GET /api/v1/auth/session` | The server-resolved `{ id, roles }` or `401` for absent, expired or revoked sessions. |
+| `POST /api/v1/auth/logout` | `204`, revokes the session and clears its cookie. |
+
+Browser writes, including login, require an exact `Origin` from `CORS_ORIGINS`
+and `X-TRASU-CSRF: 1`; configure an explicit frontend origin and send requests
+with credentials. The cookie uses `SameSite=Lax`, is `Secure` by default,
+and expires after eight hours. For local HTTP only, set `NODE_ENV=development`,
+`AUTH_ALLOW_LOCAL_HTTP=true` and an explicit loopback `CORS_ORIGINS` (for example,
+`http://127.0.0.1:5173`). The peer, request host and HTTP origin must all be
+loopback. Do not expose this mode through a proxy or tunnel. Outside this mode,
+login and logout reject unapproved HTTP with `403` before changing session
+state. Production rejects HTTP CORS origins and the local opt-in.
+
+For the loopback HTTP listener behind a TLS terminator, configure
+`AUTH_LOOPBACK_PROXY_SECRET` as a random 32-byte secret encoded as 43 base64url
+characters. The trusted local proxy must accept only HTTPS for session traffic,
+strip client-supplied forwarding/proof headers, and set `X-Forwarded-Proto: https`
+and `X-TRASU-Proxy-Proof` to the configured secret on its private loopback hop.
+Never expose the proof to browsers or log it. Without this opt-in, forwarded
+headers do not establish HTTPS. The proxy and local HTTP modes are mutually
+exclusive.
+Session authentication does
+not grant access to a resource; consumers must still invoke `AccessPolicy`.
+
+Login returns `429` for overlapping attempts from one socket peer or more than
+12 admitted attempts in its one-minute window. It returns `503` when four
+checks are in flight or the bounded peer registry is full. There is no queue.
+Peer attribution uses the socket address, not forwarded headers: a shared
+proxy or NAT shares one budget. For a proxied deployment, enforce appropriate
+per-client limits at the trusted ingress; the application's global ceiling
+still applies. Traffic from multiple peers can still exhaust that ceiling.
+
+`case:read` allows a current holder with the matching server-side role; a
+matching role without the assignment is not enough. Search must apply the
+same predicate before pagination and counting, and case detail must map a
+denial to the same `404` as a missing case. No case write attribution is
+created here. Explicit deployment allowlists `OPERATIONS_OPERATOR_IDS`
+and `AUDIT_READER_IDS` contain comma-separated participant UUIDs and are
+empty by default. Operations require the `support` membership as well; for
+existing interventions, only an attributed opener can verify, close or read
+its intervention. Audit reads require the `auditor` membership and an exact
+existing event. These settings do not create accounts or memberships.
+
+Successful login/logout and their audit events commit together. Credential
+denials are recorded separately without attempting to infer an actor from
+the submitted login. No password, raw token or request body is audit evidence.
+
 ## Data foundation (BE-006)
 
 The first domain migration creates the seven tables defined in the

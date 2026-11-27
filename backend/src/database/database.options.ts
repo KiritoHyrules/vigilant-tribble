@@ -3,9 +3,17 @@ import type { DataSourceOptions } from 'typeorm';
 import type { EnvironmentVariables } from '../config/env.validation';
 
 type PostgresOptions = Extract<DataSourceOptions, { type: 'postgres' }>;
+type PostgresEnvironment = Pick<
+  EnvironmentVariables,
+  | 'POSTGRES_HOST'
+  | 'POSTGRES_PORT'
+  | 'POSTGRES_DB'
+  | 'POSTGRES_USER'
+  | 'POSTGRES_PASSWORD'
+>;
 
 /** Configuración única para la aplicación y la CLI de migraciones. */
-export function databaseOptions(env: EnvironmentVariables): PostgresOptions {
+export function databaseOptions(env: PostgresEnvironment): PostgresOptions {
   return {
     type: 'postgres',
     host: env.POSTGRES_HOST,

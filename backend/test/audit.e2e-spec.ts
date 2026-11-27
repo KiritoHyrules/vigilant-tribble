@@ -158,10 +158,12 @@ describe('BE-008 audit schema', () => {
       'responsibility',
       'role',
     ];
-    expect(rows).toEqual(names.map((tablename) => ({ tablename })));
+    expect(rows).toEqual(
+      expect.arrayContaining(names.map((tablename) => ({ tablename }))),
+    );
     expect(
       cli.entityMetadatas.map((entity) => entity.tableName).sort(),
-    ).toEqual(names);
+    ).toEqual(expect.arrayContaining(names));
     const app = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -171,7 +173,7 @@ describe('BE-008 audit schema', () => {
           .get(DataSource)
           .entityMetadatas.map((entity) => entity.tableName)
           .sort(),
-      ).toEqual(names);
+      ).toEqual(expect.arrayContaining(names));
       expect(app.get(AuditService)).toBeInstanceOf(AuditService);
     } finally {
       await app.close();
