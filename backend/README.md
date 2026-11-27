@@ -110,3 +110,29 @@ Riesgo residual: `npm audit` completo mantiene alertas moderadas en herramientas
 { "statusCode": 400, "error": "Bad Request", "message": "...", "path": "/api/v1/...", "timestamp": "..." }
 ```
 Los errores 5xx no exponen detalles internos.
+
+## Data foundation (BE-006)
+
+The first domain migration creates the seven tables defined in the
+[BE-001 contract](https://github.com/KiritoHyrules/vigilant-tribble/pull/22).
+Nest and the migration CLI load the same module-owned entities. PostgreSQL
+owns the stored reference match key and both partial unique indexes.
+Synchronization and automatic migrations remain disabled.
+
+From `backend/`, against an isolated PostgreSQL 17 database:
+
+```sh
+npm run migration:show
+npm run migration:run
+npm run test:e2e
+```
+
+`npm run seed:demo` adds fictitious rows with stable keys; repeating it does not
+duplicate them. It requires an explicit `NODE_ENV=development` or `NODE_ENV=test`
+and a loopback PostgreSQL host. Run it only after migrating a disposable or
+local demo database. It does not create accounts, passwords, or real roles for
+any user.
+
+`npm run migration:revert` drops the foundation tables and their contents.
+Test rollback only against a disposable database. Do not use it to repair a
+database that contains real or shared data.

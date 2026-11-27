@@ -6,6 +6,8 @@ import { ENV_FILES } from './config/env.files';
 import { EnvironmentVariables, validateEnv } from './config/env.validation';
 import { databaseOptions } from './database/database.options';
 import { HealthController } from './health/health.controller';
+import { IdentityPersistenceModule } from './modules/auth/identity-persistence.module';
+import { CasePersistenceModule } from './modules/cases/case-persistence.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { HealthController } from './health/health.controller';
       }),
     }),
     SecurityModule,
+    IdentityPersistenceModule,
+    CasePersistenceModule,
   ],
   controllers: [HealthController],
 })
