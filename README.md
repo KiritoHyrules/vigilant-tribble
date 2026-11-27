@@ -23,16 +23,13 @@ autenticación real ni persistencia institucional.
 ├── AGENTS.md
 ├── CONTRIBUTING.md
 ├── README.md
-├── backend/
-│   └── README.md
+├── backend/README.md
 ├── compose.yaml
-├── contracts/
-│   └── README.md
+├── contracts/README.md
 ├── docs/
 │   ├── architecture.md
 │   └── engineering-plan.md
 └── frontend/           # Aplicación web y toda su configuración
-    ├── README.md       # Instalación, comandos, perfiles demo y límites
     ├── package.json
     ├── package-lock.json
     ├── src/            # Componentes, pantallas, datos demo y tipos
@@ -42,6 +39,9 @@ autenticación real ni persistencia institucional.
     ├── scripts/        # Utilidades del frontend
     └── .figma/make/    # Integración existente con Figma
 ```
+
+La [guía del frontend](frontend/README.md) reúne la instalación, los comandos,
+los perfiles de demostración y sus límites.
 
 ## Ejecutar el frontend
 
