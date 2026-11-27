@@ -39,6 +39,25 @@ y las pruebas de regresión; no requiere inventar un fallo funcional.
 Revisar el diff después de usar `npm run format`: el comando modifica archivos.
 No mezclar un reformateo global con un cambio funcional acotado.
 
+## Colaboración durante la construcción
+
+- Partir de un Issue Ready con sus dependencias satisfechas. Mantener una tarea
+  activa por integrante, priorizar revisiones y crear una rama corta desde
+  `main` actualizado (por ejemplo, `feat/BE-003-expedientes`).
+- No hacer push directo a `main` ni force push. Vincular el PR al Issue, pedir
+  revisión de otro integrante y exigir comprobaciones exitosas. I1 revisa
+  contratos de datos y migraciones. Usar squash merge si el equipo lo habilita
+  y eliminar la rama después de integrar.
+- Leer [AGENTS.md](AGENTS.md) y [la arquitectura](docs/architecture.md).
+  Mantener las convenciones de commits y las comprobaciones del frontend.
+  No incluir secretos ni material académico privado.
+- Coordinar con los consumidores antes de modificar un contrato compartido.
+  BE-002 es el único bootstrap de NestJS. Usar migraciones versionadas y
+  aprobadas; no crear tablas manualmente en cloud.
+- Una tarea pasa a Done cuando el comportamiento fue comprobado, las pruebas
+  y el diff fueron revisados y el PR fue aprobado e integrado. Informar
+  bloqueos y fallas de CI sin saltar controles.
+
 ## Commits
 
 Usar mensajes breves que describan el resultado real, con el formato

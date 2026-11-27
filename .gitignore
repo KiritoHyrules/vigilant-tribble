@@ -9,5 +9,6 @@ test-results/
 .codegraph/
 playwright-report/
 coverage/
+*.tsbuildinfo
 *.log
 *.zip

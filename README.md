@@ -11,9 +11,26 @@ autenticación real ni persistencia institucional.
 
 ```text
 .
-├── README.md           # Presentación y guía general del repositorio
-├── CONTRIBUTING.md     # Convenciones y comprobaciones para contribuir
-├── .gitignore          # Exclusiones comunes a los proyectos
+├── .env.example
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug.md
+│   │   └── task.md
+│   ├── pull_request_template.md
+│   └── workflows/
+│       └── frontend-ci.yml
+├── .gitignore
+├── AGENTS.md
+├── CONTRIBUTING.md
+├── README.md
+├── backend/
+│   └── README.md
+├── compose.yaml
+├── contracts/
+│   └── README.md
+├── docs/
+│   ├── architecture.md
+│   └── engineering-plan.md
 └── frontend/           # Aplicación web y toda su configuración
     ├── README.md       # Instalación, comandos, perfiles demo y límites
     ├── package.json
@@ -25,11 +42,6 @@ autenticación real ni persistencia institucional.
     ├── scripts/        # Utilidades del frontend
     └── .figma/make/    # Integración existente con Figma
 ```
-
-Cuando se implemente, el backend se incorporará en `backend/`, al mismo nivel
-que `frontend/`, con su propio README, dependencias, configuración y pruebas.
-Por ahora no se crean un servicio ficticio ni archivos de configuración para
-una tecnología de backend que todavía no se ha elegido.
 
 ## Ejecutar el frontend
 
@@ -59,6 +71,42 @@ npm run test:e2e -- --workers=1 --reporter=line
 Las pruebas de navegador requieren Google Chrome. La compilación se genera en
 `frontend/dist/`; no se incluye en Git. Para inspeccionarla localmente después
 de compilar, ejecutar `npm run preview` desde `frontend/`.
+
+## Construcción del backend
+
+El backend se incorporará en `backend/` con dependencias independientes del
+frontend. Stack decidido: NestJS, TypeScript, Node 24 LTS, PostgreSQL y TypeORM.
+Consultar [arquitectura](docs/architecture.md), [plan técnico](docs/engineering-plan.md),
+[contratos](contracts/README.md) y [estado del backend](backend/README.md).
+El frontend conserva sus recorridos de demostración sin depender de una API.
+
+### PostgreSQL para desarrollo local
+
+Requiere Docker con Compose. En la raíz, copiar `.env.example` a `.env`
+(`Copy-Item .env.example .env` en PowerShell o `cp .env.example .env` en bash)
+y definir una contraseña local no reutilizada. No versionar `.env`.
+
+```sh
+docker compose config --quiet
+docker compose up -d postgres
+docker compose ps
+docker compose exec postgres pg_isready -U trasu_dev -d trasu_dev
+```
+
+Si cambian el usuario o la base, ajustar el último comando. El puerto 5432
+solo escucha en loopback; si está ocupado, cambiar `POSTGRES_PORT`.
+`docker compose down` detiene el entorno sin borrar el volumen; no agregar `-v`
+salvo que se quiera eliminar sus datos. Cambiar la contraseña en `.env` no
+actualiza un volumen ya inicializado. Este entorno no es para producción.
+El backend y sus migraciones se incorporarán con sus tarjetas.
+
+## Trabajo en equipo
+
+Leer [AGENTS.md](AGENTS.md) antes de utilizar agentes. El tablero GitHub Projects
+será el estado operativo de las tareas; el plan técnico es la referencia de
+construcción. La CI frontend comprueba instalación reproducible, tipos y
+compilación. Las pruebas de navegador siguen siendo obligatorias en local hasta
+que se configure y verifique CI e2e. La CI backend se incorporará con BE-002.
 
 ## Documentación
 
