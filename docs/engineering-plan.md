@@ -1,8 +1,37 @@
 # TRASU — Plan operativo de construcción del backend y base de datos
 
-> Estado: plan de trabajo; las tarjetas no se consideran ejecutadas por incorporar este kit. Compose y CI frontend se proporcionan como punto de partida, sujetos a verificación; BE-001 y BE-002 conservan sus responsables.
+> Estado operativo: consultar el [Kanban versionado](#kanban-operativo). Los Issues enlazados conservan el alcance, el historial y las evidencias de ejecución.
 
 **Equipo:** cinco integrantes, 3–4 h/día por persona, conocimientos equivalentes como supuesto y agentes de IA disponibles. **Objetivo:** MVP académico con prácticas de ingeniería cercanas a producción, frontend vigente preservado. **Alcance inmediato:** primer incremento real, no promesa de terminar el MVP en una fecha no confirmada.
+
+## Kanban operativo
+
+Estado verificado el 2026-11-27: **1 Done, 4 Ready, 13 Backlog**. Este es el único tablero operativo en Markdown; no mantener una copia local paralela. Los cambios de estado se registran en esta tabla con evidencia enlazada al Issue o PR. Una etiqueta histórica no prevalece sobre el cierre verificado de un Issue.
+
+| Tarjeta | Responsable | Estado | Evidencia o condición de entrada |
+|---|---|---|---|
+| [BE-001](https://github.com/KiritoHyrules/vigilant-tribble/issues/2) | I1 | Ready | Abierta; el scaffold ya está disponible. |
+| [BE-002](https://github.com/KiritoHyrules/vigilant-tribble/issues/3) | I2 | Done | [Aprobación de I1](https://github.com/KiritoHyrules/vigilant-tribble/pull/20#pullrequestreview-6083824236); [PR #20](https://github.com/KiritoHyrules/vigilant-tribble/pull/20) fusionado por squash en [`2466758`](https://github.com/KiritoHyrules/vigilant-tribble/commit/2466758cd36a8b1be938b2a12df20c5fd51d55d6); Issue cerrado por `Closes #3`. |
+| [BE-003](https://github.com/KiritoHyrules/vigilant-tribble/issues/4) | I3 | Ready | Abierta; puede contrastar el contrato de expedientes con la base integrada. |
+| [BE-004](https://github.com/KiritoHyrules/vigilant-tribble/issues/5) | I4 | Ready | Abierta; puede avanzar el contrato documental. |
+| [BE-005](https://github.com/KiritoHyrules/vigilant-tribble/issues/6) | I5 | Ready | Abierta; puede avanzar el contrato de auditoría y adaptadores. |
+| [BE-006](https://github.com/KiritoHyrules/vigilant-tribble/issues/7) | I1, con I2/I3 | Backlog | G1; diccionario y restricciones mínimas ratificados. |
+| [BE-007a](https://github.com/KiritoHyrules/vigilant-tribble/issues/8) | I2 | Backlog | G1 y parte de identidad de BE-006. |
+| [BE-007b](https://github.com/KiritoHyrules/vigilant-tribble/issues/9) | I3 | Backlog | G1, BE-003, BE-006 y política de I2. |
+| [BE-008](https://github.com/KiritoHyrules/vigilant-tribble/issues/10) | I5 | Backlog | G1 y esquema de auditoría aprobado a partir de BE-005. |
+| [BE-009a](https://github.com/KiritoHyrules/vigilant-tribble/issues/11) | I4 | Backlog | G1, contrato de BE-004, IDs y FK aprobados para persistencia. |
+| [BE-010](https://github.com/KiritoHyrules/vigilant-tribble/issues/12) | I1, con I2/I3 | Backlog | BE-007a, BE-007b y BE-008. |
+| [BE-011](https://github.com/KiritoHyrules/vigilant-tribble/issues/13) | I3 | Backlog | BE-007b, BE-008 y transiciones de BE-003. |
+| [BE-009b](https://github.com/KiritoHyrules/vigilant-tribble/issues/14) | I4 | Backlog | BE-009a, BE-011, BE-008 y contrato de BE-004. |
+| [BE-012](https://github.com/KiritoHyrules/vigilant-tribble/issues/15) | I5 | Backlog | BE-005 y BE-008; BE-009b solo para salida ordinaria. |
+| [BE-013](https://github.com/KiritoHyrules/vigilant-tribble/issues/16) | I1 | Backlog | BE-007b y BE-011; BE-009b solo para pendientes documentales. |
+| [BE-014](https://github.com/KiritoHyrules/vigilant-tribble/issues/17) | I5 | Backlog | BE-008 y contrato de mantenimiento de BE-005. |
+| [BE-015](https://github.com/KiritoHyrules/vigilant-tribble/issues/18) | I1–I5, por módulo | Backlog | Flujo implementado y contrato aprobado por módulo. |
+| [BE-016](https://github.com/KiritoHyrules/vigilant-tribble/issues/19) | I1 e I2 | Backlog | G2 y autorización de proveedor, presupuesto y acceso. |
+
+**G1 sigue pendiente:** el scaffold ya está integrado, pero faltan los contratos mínimos de identidad, expediente y auditoría, y el diccionario y restricciones compartidas. No adelantar la persistencia de dominio por la sola integración de BE-002.
+
+**Seguimiento de I2:** la auditoría de BE-002 registró 19 alertas moderadas de desarrollo y 0 de producción. No se realizaron actualizaciones adicionales ni se repitieron esas pruebas para consolidar el tablero.
 
 ## 1. Decisiones de dirección técnica
 
@@ -29,7 +58,7 @@ I1 aprueba cambios del esquema y de interfaces compartidas, no monopoliza su imp
 
 1. Clonar el repositorio (`git clone git@github.com:KiritoHyrules/vigilant-tribble.git` si SSH está configurado), `git switch main`, `git pull --ff-only`. Verificar `git status` limpio y anotar `git rev-parse HEAD`. Todos comienzan con el mismo commit. No borrar cambios ajenos.
 2. En `frontend/`: `npm ci`, `npm run typecheck`, `npm run build`; ejecutar `npm run test:e2e -- --workers=1 --reporter=line` según README y requisitos de Chrome. Registrar fallos preexistentes sin arreglarlos fuera de la tarea. I1 registra baseline; los demás pueden inspeccionar sus vistas sin esperar toda la suite.
-3. GitHub Projects: Backlog, Ready, In progress, Review, Done; bloqueo como etiqueta. Un issue activo por persona, hasta cinco en ejecución. Revisión tiene prioridad sobre comenzar otro issue. Crear rama desde main actualizado: `git switch -c feat/BE-xxx-descripcion`. No abrir cinco ramas que inicialicen NestJS. Solo I2 inicializa. No usar `git push --force` ni modificar main directamente. PR pequeño, enlazado al issue; aprobación ajena, CI y revisión de migraciones/contratos cuando aplique. Si alguna regla de protección no está disponible, aplicar manualmente.
+3. Kanban versionado: Backlog, Ready, In progress, Review y Done; los bloqueos se registran en el Issue con causa y responsable de desbloqueo. Una tarea activa por integrante, hasta cinco en ejecución. Revisión tiene prioridad sobre comenzar otro Issue. Crear rama desde main actualizado: `git switch -c feat/BE-xxx-descripcion`. Solo I2 inicializa NestJS. No usar `git push --force` ni modificar main directamente. PR pequeño, enlazado al Issue; aprobación ajena, CI y revisión de migraciones/contratos cuando aplique. Si alguna regla de protección no está disponible, aplicar manualmente.
 4. Los cinco agentes reciben este documento, el informe local (no subir material privado al repo público), las instrucciones del repo y solo la tarjeta asignada. No cambian otros módulos, dependencias, reglas, diseño visual o datos comunes sin aprobación; no inventan campos/permisos. No ejecutar comandos destructivos ni exponer secretos. Cada agente entrega diff, comandos y resultados, supuestos y bloqueos. No declarar pruebas que no ejecutó.
 5. Convenciones: timestamps de eventos en UTC y fechas civiles de plazos en America/Lima; IDs internos UUID (propuesta técnica), referencias externas distintas del PK; errores consistentes 400/401/403 o 404 según política de ocultación/409/500 sin filtración de datos; paginación explícita; DTOs separados de entidades; estado de negocio mediante operaciones explícitas, no PATCH genérico; decisiones y evidencia de cambios en una misma transacción local. No alterar historial para corregirlo.
 6. Fuente única de migraciones: `backend/src/database/migrations/` (ruta propuesta, fijar en bootstrap). I1 serializa el orden y revisa colisiones. Un archivo de migración por cambio lógico, no editar migración aplicada. Sin tablas creadas manualmente en cloud; seed idempotente y solo demo; credenciales mediante env local no versionado. No usar SQLite para sustituir pruebas PostgreSQL.
@@ -37,6 +66,8 @@ I1 aprueba cambios del esquema y de interfaces compartidas, no monopoliza su imp
 8. Definition of Done (todas las tarjetas): criterio funcional probado, casos negativos cuando apliquen, build/typecheck/test exitosos, migración desde BD vacía y actualización cuando corresponda, documentación mínima actualizada, diff acotado, PR aprobado e integrado. No se considera Done por tener código generado.
 
 ## 4. Primera sesión (3 horas/persona): cinco tareas ejecutables inmediatamente
+
+Las fichas de esta sección describen el alcance original; el estado vigente se consulta en el [Kanban operativo](#kanban-operativo).
 
 Objetivo: acordar un contrato mínimo, tener NestJS arrancable y preparar pruebas/implementación sin colisiones. Estimaciones orientativas; 15 horas-persona brutas, no comprometer más de lo que pase los gates.
 
@@ -81,6 +112,8 @@ Cada tarjeta se subdivide si supera una sesión. Estimaciones de esfuerzo no son
 
 ## 6. Diseño de datos por incrementos: responsabilidad I1
 
+**Seguimiento de BE-001 ([Issue #2](https://github.com/KiritoHyrules/vigilant-tribble/issues/2)):** el [contrato de fundamentos de datos v1](../contracts/data-foundation-v1.md) es el entregable de ratificación. BE-001 permanece abierta durante revisión cruzada e integración; la publicación del PR no acredita G1 ni cambia el estado de otras tarjetas.
+
 No diseñar a ciegas todo el ERD. Base candidata de conceptos (no tablas aprobadas): identidad/rol/sesión; expediente/referencia/clasificación/incidencia; asignación por ámbito/solicitud/decisión; proyecto/versiones/revisiones/observaciones/atenciones; eventos de plazos y calendario; intercambio/intento/derivación; eventos auditables y mantenimiento. Cada responsable aporta evidencia del frontend y RF/RN, I1 concilia y aprueba el esquema de cada incremento. La BD garantiza lo que puede garantizar declarativamente (PK, FK, UNIQUE, CHECK); el servicio verifica atribuciones, invariantes que cruzan relaciones y transiciones dentro de transacciones. Evitar duplicar estado derivable sin justificación. No usar cascadas de borrado sobre historial. Para responsabilidad vigente por ámbito evaluar restricción única parcial; para duplicidad de expediente, definir equivalencia institucional antes de imponer unicidad; para decisiones concurrentes, transacción y bloqueo o versión optimista. No imponer cardinalidad o campos sin evidencia.
 
 Proceso por cambio: propuesta de entidad/relación → revisar consumidores y reglas → aprobar → autor del módulo genera migración → I1 revisa orden y compatibilidad → CI con PostgreSQL real → PR. Cada desarrollador aplica localmente migraciones aprobadas; staging se actualiza exclusivamente desde main. Los diagramas conceptual/lógico/físico son resultado del diseño acordado, no requisito para comenzar todos los módulos.
@@ -97,4 +130,4 @@ Primeros 10 min: cada uno dice qué entregó, qué issue ejecutará y bloqueo es
 
 Desde clon limpio: arrancar PostgreSQL local, instalar dependencias, migrar/seed, arrancar backend/frontend, ejecutar pruebas. Mostrar acceso válido, inválido y consulta autorizada; intentar acceder fuera de ámbito y demostrar que se deniega; verificar datos tras reiniciar servidor; mostrar trazabilidad persistente. Si se completó asignación, demostrar solicitud, decisión e historial; si se completó documental, demostrar revisión y nueva versión sin perder la anterior. Documentar cada flujo no implementado como pendiente y distinguir interfaces institucionales simuladas de lógica real.
 
-**Limitaciones y decisiones delegadas:** nombres de módulos/endpoints/entidades son propuestas de dirección técnica sujetas al contraste breve con el código real; las versiones exactas de paquetes se fijan en bootstrap, el presupuesto cloud y fecha no están confirmados; no se ha ejecutado el repositorio ni creado Issues/PR. Este documento ordena la construcción, no certifica que el sistema esté construido.
+**Limitaciones y decisiones delegadas:** nombres de módulos/endpoints/entidades son propuestas de dirección técnica sujetas al contraste con el código real; la línea base del bootstrap está en [arquitectura](architecture.md). El presupuesto cloud y la fecha no están confirmados. Este documento ordena la construcción, no certifica que el sistema esté construido.
